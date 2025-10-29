@@ -4,6 +4,7 @@ import dev.piyush.productservice.dto.FakeStoreProductDto;
 import dev.piyush.productservice.dto.GenericProductDto;
 import dev.piyush.productservice.exception.NotFoundException;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -83,6 +84,29 @@ public class FakeStoreProductService implements ProductServices{
                 (specificProductRequestUrl, HttpMethod.DELETE, requestCallback, responseExtractor, id);
         FakeStoreProductDto fakeStoreProductDto = response.getBody();
         return convertFakeStoreDtoToGenricProductDto(fakeStoreProductDto);
+    }
+
+    @Override
+    public GenericProductDto updateProductById(Long id, GenericProductDto updatedProduct) {
+        RestTemplate restTemplate = restTemplateBuilder.build();
+
+        FakeStoreProductDto fakeStoreProductDto = new FakeStoreProductDto();
+        fakeStoreProductDto.setTitle(updatedProduct.getTitle());
+        fakeStoreProductDto.setDescription(updatedProduct.getDiscription());
+        fakeStoreProductDto.setPrice(updatedProduct.getPrice());
+        fakeStoreProductDto.setImage(updatedProduct.getImage());
+        fakeStoreProductDto.setCategory(updatedProduct.getCategory());
+
+        HttpEntity<FakeStoreProductDto> requestEnity = new HttpEntity<>(fakeStoreProductDto);
+
+        ResponseEntity<FakeStoreProductDto> response = restTemplate.exchange(
+                specificProductRequestUrl,
+                HttpMethod.PUT,
+                requestEnity,
+                FakeStoreProductDto.class,
+                id);
+        FakeStoreProductDto responseFakestoreDto = response.getBody();
+        return convertFakeStoreDtoToGenricProductDto(responseFakestoreDto);
     }
 
 }
